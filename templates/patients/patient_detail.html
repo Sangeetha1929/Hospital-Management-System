@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}Patient Details | CityCare Hospital{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="page-head reveal">
+            <h2>{{ patient.user.get_full_name|default:patient.user.username }}</h2>
+            <p class="muted">Patient profile &amp; appointment history</p>
+        </div>
+
+        <div class="btn-row reveal">
+            <a href="{% url 'patient_list' %}" class="btn btn-sm btn-outline">&larr; Back</a>
+            <a href="{% url 'patient_delete' patient.pk %}" class="btn btn-sm btn-danger">Delete Patient</a>
+        </div>
+
+        <div class="doctor-info-grid">
+            <div class="info-card card reveal-from-left">
+                <h4>Personal</h4>
+                <p><strong>Username:</strong> {{ patient.user.username }}</p>
+                <p><strong>Email:</strong> {{ patient.user.email }}</p>
+                <p><strong>Phone:</strong> {{ patient.phone|default:"-" }}</p>
+                <p><strong>Gender:</strong> {{ patient.get_gender_display|default:"-" }}</p>
+                <p><strong>DOB:</strong> {{ patient.date_of_birth|default:"-" }}</p>
+                <p><strong>Blood Group:</strong> {{ patient.blood_group|default:"-" }}</p>
+            </div>
+            <div class="info-card card reveal-from-right">
+                <h4>Emergency &amp; Notes</h4>
+                <p><strong>Emergency Contact:</strong> {{ patient.emergency_contact|default:"-" }}</p>
+                <p><strong>Address:</strong> {{ patient.address|default:"-" }}</p>
+                {% if patient.medical_notes %}
+                    <p><strong>Medical Notes:</strong> {{ patient.medical_notes }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card reveal">
+            <h3>Appointments</h3>
+            {% if appointments %}
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Doctor</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for appt in appointments %}
+                                <tr>
+                                    <td>Dr. {{ appt.doctor.name }}</td>
+                                    <td>{{ appt.date }}</td>
+                                    <td>{{ appt.time }}</td>
+                                    <td><span class="badge badge-{{ appt.status }}">{{ appt.get_status_display }}</span></td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                {% include 'includes/empty_state.html' with message="No appointments for this patient." %}
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

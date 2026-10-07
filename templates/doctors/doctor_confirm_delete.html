@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Doctor | CityCare Hospital{% endblock %}
+
+{% block content %}
+<div class="container section">
+    <div class="card confirm-card reveal-zoom">
+        <h2>Delete Doctor</h2>
+        <p>Are you sure you want to delete <strong>Dr. {{ doctor.name }}</strong>?</p>
+        <p class="muted">This action cannot be undone.</p>
+        <form method="post">
+            {% csrf_token %}
+            <div class="btn-row confirm-actions">
+                <button type="submit" class="btn btn-danger">Yes, Delete</button>
+                <a href="{% url 'doctor_detail' doctor.pk %}" class="btn btn-outline">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

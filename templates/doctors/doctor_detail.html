@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Dr. {{ doctor.name }} | CityCare Hospital{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="doctor-detail card reveal-zoom">
+            <div class="doctor-detail-head">
+                <div class="doctor-avatar doctor-avatar-lg">{{ doctor.name|make_list|first }}</div>
+                <div>
+                    <h2>Dr. {{ doctor.name }}</h2>
+                    <p class="muted">{{ doctor.specialization }}</p>
+                    <p class="badge">{{ doctor.get_department_display }}</p>
+                </div>
+                <div class="doctor-detail-actions">
+                    {% if user.is_authenticated and user.profile.user_type == 'patient' %}
+                        <a href="{% url 'appointment_create' %}" class="btn">Book Appointment</a>
+                    {% endif %}
+                    {% if user.is_authenticated and user.profile.user_type == 'staff' %}
+                        <div class="btn-row">
+                            <a href="{% url 'doctor_update' doctor.pk %}" class="btn">Edit</a>
+                            <a href="{% url 'doctor_delete' doctor.pk %}" class="btn btn-danger">Delete</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="doctor-info-grid">
+                <div class="info-card">
+                    <h4>Contact</h4>
+                    <p><strong>Phone:</strong> {{ doctor.phone }}</p>
+                    <p><strong>Email:</strong> {{ doctor.email }}</p>
+                </div>
+                <div class="info-card">
+                    <h4>Experience</h4>
+                    <p><strong>Years:</strong> {{ doctor.experience_years }}</p>
+                    <p><strong>Availability:</strong> {{ doctor.availability|default:"Please contact" }}</p>
+                </div>
+            </div>
+
+            {% if doctor.bio %}
+                <div class="doctor-bio">
+                    <h4>About the Doctor</h4>
+                    <p>{{ doctor.bio }}</p>
+                </div>
+            {% endif %}
+
+            <a href="{% url 'doctor_list' %}" class="btn btn-sm btn-outline">&larr; Back to Doctors</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

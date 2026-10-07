@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Patient Details | CityCare Hospital{% endblock %}
+
+{% block content %}
+<div class="container section">
+    <div class="page-head reveal">
+        <h2>Patient Details</h2>
+        <p class="muted">Your medical &amp; contact information</p>
+    </div>
+    <div class="card form-card reveal">
+        <form method="post" class="form form-grid" novalidate>
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" value="{{ request.user.username }}" disabled>
+            </div>
+            <div class="form-group">
+                <label for="id_first_name">First Name</label>
+                <input type="text" name="first_name" value="{{ form.first_name.value|default:'' }}" id="id_first_name">
+            </div>
+            <div class="form-group">
+                <label for="id_last_name">Last Name</label>
+                <input type="text" name="last_name" value="{{ form.last_name.value|default:'' }}" id="id_last_name">
+            </div>
+            <div class="form-group">
+                <label for="{{ form.email.id_for_label }}">Email</label>
+                {{ form.email }}
+            </div>
+            {% for field in form %}
+                {% if field.name != 'first_name' and field.name != 'last_name' and field.name != 'email' %}
+                    <div class="form-group">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <div class="field-error">{% for e in field.errors %}{{ e }} {% endfor %}</div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+            <div class="btn-row form-group-full">
+                <button type="submit" class="btn">Save</button>
+                <a href="{% url 'patient_dashboard' %}" class="btn btn-outline">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Book Appointment | CityCare Hospital{% endblock %}
+
+{% block content %}
+<div class="container section">
+    <div class="page-head reveal">
+        <h2>Book an Appointment</h2>
+        <p class="muted">Choose your doctor, date and time</p>
+    </div>
+    <div class="card form-card reveal">
+        <form method="post" class="form" novalidate>
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="field-error">{% for e in field.errors %}{{ e }} {% endfor %}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <div class="btn-row">
+                <button type="submit" class="btn">Book Appointment</button>
+                <a href="{% url 'appointment_list' %}" class="btn btn-outline">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

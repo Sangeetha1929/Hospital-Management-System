@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Our Doctors | CityCare Hospital{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="page-head reveal">
+            <h2>Our Doctors</h2>
+            <p class="muted">Meet our expert medical team</p>
+        </div>
+
+        <div class="toolbar reveal">
+            <form method="get" class="search-form">
+                <input type="text" name="q" value="{{ query }}" placeholder="Search by name or specialization...">
+                <button type="submit" class="btn btn-sm">Search</button>
+            </form>
+            
+        </div>
+
+        <div class="doctors-grid">
+            {% for doctor in doctors %}
+                {% if forloop.counter0 == 0 %}
+                    <div class="doctor-card reveal reveal-delay-1">
+                {% elif forloop.counter0 == 1 %}
+                    <div class="doctor-card reveal reveal-delay-2">
+                {% elif forloop.counter0 == 2 %}
+                    <div class="doctor-card reveal reveal-delay-3">
+                {% elif forloop.counter0 == 3 %}
+                    <div class="doctor-card reveal reveal-delay-4">
+                {% else %}
+                    <div class="doctor-card reveal reveal-delay-5">
+                {% endif %}
+                    <div class="doctor-avatar">{{ doctor.name|make_list|first }}</div>
+                    <h3>Dr. {{ doctor.name }}</h3>
+                    <p class="muted"><strong>{{ doctor.specialization }}</strong></p>
+                    <p class="muted">{{ doctor.get_department_display }}</p>
+                    <p class="muted">{{ doctor.experience_years }} years experience</p>
+                    <div class="doctor-actions">
+                        <a href="{% url 'doctor_detail' doctor.pk %}" class="btn btn-sm btn-outline">Details</a>
+                        {% if user.is_authenticated and user.profile.user_type == 'staff' %}
+                            <a href="{% url 'doctor_update' doctor.pk %}" class="btn btn-sm">Edit</a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% empty %}
+                {% include 'includes/empty_state.html' with message="No doctors found. Try a different search." %}
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

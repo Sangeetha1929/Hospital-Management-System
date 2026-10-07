@@ -1,0 +1,112 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CityCare Hospital{% endblock %}</title>
+    <meta name="description" content="CityCare Hospital &mdash; compassionate, world-class healthcare for you and your family. Book appointments with our specialist doctors.">
+    <meta name="theme-color" content="#0b7285">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-hidden="true">
+            <a href="{% url 'home' %}" class="brand">
+                <span class="brand-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M13.4 2.5a1.6 1.6 0 0 0-2.8 0L9.8 5H7.1A1.6 1.6 0 0 0 5.5 6.6v2.7l-2.4.8a1.6 1.6 0 0 0-.8 2.7l2 2.9a1.6 1.6 0 0 0 2.8.2l1.9-2.6 2.3 3.3v2.7a1.6 1.6 0 0 0 1.6 1.6h2.7l.8 2.4a1.6 1.6 0 0 0 2.7.8l2.9-2a1.6 1.6 0 0 0 .2-2.8l-2.6-1.9 3.3-2.3h2.7A1.6 1.6 0 0 0 20.6 12v-2.7l2.4-.8a1.6 1.6 0 0 0 .8-2.7l-2-2.9a1.6 1.6 0 0 0-2.8-.2l-1.9 2.6-2.3-3.3V4.1a1.6 1.6 0 0 0-1.4-1.6Z"/></svg>
+                </span>
+                <span class="brand-text">CityCare<em>Hospital</em></span>
+            </a>
+            <nav class="navbar" id="navbar">
+                <ul class="nav-links">
+                    <li><a href="{% url 'home' %}">Home</a></li>
+                    <li><a href="{% url 'doctor_list' %}">Doctors</a></li>
+                    {% if user.is_authenticated %}
+                        {% if user.profile.user_type == 'patient' %}
+                            <li><a href="{% url 'patient_dashboard' %}">Dashboard</a></li>
+                            <li><a href="{% url 'appointment_list' %}">Appointments</a></li>
+                        {% elif user.profile.user_type == 'staff' %}
+                            <li><a href="{% url 'patient_list' %}">Patients</a></li>
+                            <li><a href="{% url 'appointment_list' %}">Appointments</a></li>
+                            <li><a href="{% url 'doctor_create' %}">Add Doctor</a></li>
+                        {% endif %}
+                    {% endif %}
+                </ul>
+                <ul class="nav-actions">
+                    {% if user.is_authenticated %}
+                        <li><a href="{% url 'profile' %}" class="btn btn-sm">{{ user.username }}</a></li>
+                        <li>
+                            <form action="{% url 'logout' %}" method="post" class="inline-form">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline">Logout</button>
+                            </form>
+                        </li>
+                    {% else %}
+                        <li><a href="{% url 'login' %}" class="btn btn-sm btn-outline">Login</a></li>
+                        <li><a href="{% url 'register' %}" class="btn btn-sm">Register</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            <label for="nav-toggle" class="hamburger" id="hamburger" aria-label="Toggle menu">
+                <span></span><span></span><span></span>
+            </label>
+        </div>
+    </header>
+
+    {% if messages %}
+        <div class="container">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                    <form action="" method="get" class="inline-form">
+                        <button type="submit" class="alert-close" aria-label="Close">&times;</button>
+                    </form>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <main class="main">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-grid">
+            <div class="footer-brand">
+                <h3>CityCare Hospital</h3>
+                <p>Committed to your health and well-being with compassionate care, modern medicine, and a team that listens.</p>
+            </div>
+            <div>
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="{% url 'home' %}">Home</a></li>
+                    <li><a href="{% url 'doctor_list' %}">Our Doctors</a></li>
+                    <li><a href="{% url 'appointment_create' %}">Book Appointment</a></li>
+                    {% if user.is_authenticated %}
+                        <li><a href="{% url 'profile' %}">My Profile</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+            <div>
+                <h3>Contact</h3>
+                <ul class="footer-contact">
+                    <li>123 Health Avenue, Wellness City</li>
+                    <li>+1 555 123 4567</li>
+                    <li>info@citycarehospital.com</li>
+                </ul>
+            </div>
+        </div>
+        <div class="container footer-bottom">
+            <span>&copy; {% now "Y" %} CityCare Hospital. All rights reserved.</span>
+            <span class="footer-note">Emergency care available 24/7</span>
+        </div>
+    </footer>
+    <button type="button" class="back-to-top" id="back-to-top" aria-label="Back to top">&uarr;</button>
+    <script src="{% static 'js/script.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} | CityCare Hospital{% endblock %}
+
+{% block content %}
+<div class="container section">
+    <div class="page-head reveal">
+        <h2>{{ title }}</h2>
+    </div>
+
+    <div class="card form-card reveal">
+        {% if form.non_field_errors %}
+            <div class="alert alert-error">{{ form.non_field_errors }}</div>
+        {% endif %}
+        <form method="post" class="form form-grid" novalidate>
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <div class="field-error">
+                            {% for error in field.errors %}{{ error }} {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <div class="btn-row form-group-full">
+                <button type="submit" class="btn">Save</button>
+                <a href="{% url 'doctor_list' %}" class="btn btn-outline">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

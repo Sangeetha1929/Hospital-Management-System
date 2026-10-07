@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+
+{% block title %}Appointments | CityCare Hospital{% endblock %}
+
+{% block content %}
+
+{% url 'appointment_create' as book_url %}
+
+<section class="section">
+    <div class="container">
+
+        <!-- Page Header -->
+        <div class="page-head reveal">
+
+            <h2>Appointments</h2>
+
+            <p class="muted">
+                {% if user.profile.user_type == 'staff' %}
+                    Manage all appointments
+                {% else %}
+                    Your appointments
+                {% endif %}
+            </p>
+
+        </div>
+
+
+        <!-- Toolbar -->
+        <div class="toolbar reveal">
+
+            <!-- Status Filter -->
+            <form method="get" class="search-form">
+
+                <select name="status">
+
+                    <option value="">All Statuses</option>
+
+                    {% for key, label in appointment_statuses %}
+
+                        <option value="{{ key }}"
+                            {% if status_filter == key %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ label }}
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+                <button type="submit" class="btn btn-sm">Apply</button>
+
+            </form>
+
+
+            <!-- Patient Only: Book Appointment -->
+            {% if user.profile.user_type == 'patient' %}
+
+                <a href="{% url 'appointment_create' %}"
+                   class="btn btn-sm">
+                    + Book Appointment
+                </a>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- Appointment Table -->
+        <div class="card reveal">
+
+            {% if appointments %}
+
+                <div class="table-wrap">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>Patient</th>
+                                <th>Doctor</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Reason</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            {% for appt in appointments %}
+
+                                <tr>
+
+                                    <!-- Patient -->
+                                    <td>
+                                        {{ appt.patient }}
+                                    </td>
+
+
+                                    <!-- Doctor -->
+                                    <td>
+                                        Dr. {{ appt.doctor.name }}
+                                    </td>
+
+
+                                    <!-- Date -->
+                                    <td>
+                                        {{ appt.date }}
+                                    </td>
+
+
+                                    <!-- Time -->
+                                    <td>
+                                        {{ appt.time }}
+                                    </td>
+
+
+                                    <!-- Reason -->
+                                    <td>
+                                        {{ appt.reason|default:"-"|truncatechars:40 }}
+                                    </td>
+
+
+                                    <!-- Status -->
+                                    <td>
+
+                                        <span class="badge badge-{{ appt.status }}">
+                                            {{ appt.get_status_display }}
+                                        </span>
+
+                                    </td>
+
+
+                                    <!-- Actions -->
+                                    <td>
+
+                                        <div class="btn-row btn-row-sm">
+
+
+                                            <!-- STAFF / ADMIN ACTIONS -->
+                                            {% if user.profile.user_type == 'staff' %}
+
+
+                                                <!-- Pending Appointment -->
+                                                {% if appt.status == 'pending' %}
+                                                    <form method="post" action="{% url 'appointment_status' appt.pk 'confirmed' %}" class="inline-form">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-sm">Confirm</button>
+                                                    </form>
+
+                                                {% elif appt.status == 'confirmed' %}
+                                                    <form method="post" action="{% url 'appointment_status' appt.pk 'completed' %}" class="inline-form">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-sm btn-outline">Complete</button>
+                                                    </form>
+                                                {% endif %}
+
+
+                                            {% endif %}
+
+
+                                            <!-- Cancel Action -->
+                                            {% if appt.status != 'cancelled' and appt.status != 'completed' %}
+
+                                                <a href="{% url 'appointment_cancel' appt.pk %}"
+                                                   class="btn btn-sm btn-danger">
+                                                    Cancel
+                                                </a>
+
+                                            {% endif %}
+
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+            {% else %}
+
+                {% if user.profile.user_type == 'patient' %}
+                    {% include 'includes/empty_state.html' with message="No appointments yet. Book your first visit." action_url=book_url action_label="Book Appointment" %}
+                {% else %}
+                    {% include 'includes/empty_state.html' with message="No appointments found." %}
+                {% endif %}
+
+            {% endif %}
+
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}

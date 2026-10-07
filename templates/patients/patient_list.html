@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Patients | CityCare Hospital{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="page-head reveal">
+            <h2>Manage Patients</h2>
+            <p class="muted">All registered patients</p>
+        </div>
+
+        <div class="toolbar reveal">
+            <form method="get" class="search-form">
+                <input type="text" name="q" value="{{ query }}" placeholder="Search patients...">
+                <button type="submit" class="btn btn-sm">Search</button>
+            </form>
+        </div>
+
+        <div class="card reveal">
+            {% if patients %}
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Username</th>
+                                <th>Phone</th>
+                                <th>Gender</th>
+                                <th>Blood Group</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for patient in patients %}
+                                <tr>
+                                    <td>{{ patient.user.get_full_name|default:patient.user.username }}</td>
+                                    <td>{{ patient.user.username }}</td>
+                                    <td>{{ patient.phone|default:"-" }}</td>
+                                    <td>{{ patient.gender|default:"-" }}</td>
+                                    <td>{{ patient.blood_group|default:"-" }}</td>
+                                    <td><a href="{% url 'patient_detail' patient.pk %}" class="btn btn-sm btn-outline">View</a></td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                {% include 'includes/empty_state.html' with message="No patients found." %}
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}
