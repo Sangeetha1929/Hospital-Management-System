@@ -51,6 +51,8 @@ def patient_update(request):
         form.fields['first_name'].initial = request.user.first_name
         form.fields['last_name'].initial = request.user.last_name
         form.fields['email'].initial = request.user.email
+    return render(request, 'patients/patient_form.html', {'form': form})
+
 
 @login_required
 @user_passes_test(is_staff, login_url='home')
