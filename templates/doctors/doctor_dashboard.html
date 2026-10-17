@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}Doctor Dashboard | CityCare Hospital{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="page-head reveal">
+            <h2>Welcome, Dr. {{ doctor.name }}</h2>
+            <p class="muted">Your doctor dashboard &mdash; manage your assigned appointments</p>
+        </div>
+
+        <div class="profile-layout">
+            <aside class="profile-sidebar reveal-from-left">
+                <div class="sidebar-avatar">{{ doctor.name|make_list|first|upper }}</div>
+                <h3>Dr. {{ doctor.name }}</h3>
+                <p class="muted">{{ doctor.specialization }}</p>
+                <hr>
+                <ul class="sidebar-links">
+                    <li><a href="{% url 'doctor_detail' doctor.pk %}" class="btn btn-sm btn-outline btn-block">My Public Profile</a></li>
+                    <li><a href="{% url 'profile' %}" class="btn btn-sm btn-outline btn-block">Account</a></li>
+                </ul>
+            </aside>
+
+            <div class="profile-main">
+                <div class="stats-grid stats-grid-3">
+                    <div class="stat-card reveal reveal-delay-1">
+                        <h3>{{ stats.total }}</h3>
+                        <p>Total Appointments</p>
+                    </div>
+                    <div class="stat-card reveal reveal-delay-2">
+                        <h3>{{ stats.pending }}</h3>
+                        <p>Pending</p>
+                    </div>
+                    <div class="stat-card reveal reveal-delay-3">
+                        <h3>{{ stats.confirmed }}</h3>
+                        <p>Confirmed</p>
+                    </div>
+                </div>
+
+                <div class="card reveal">
+                    <h3>My Appointments</h3>
+                    {% if appointments %}
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Patient</th>
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th>Reason</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for appt in appointments %}
+                                        <tr>
+                                            <td>{{ appt.patient }}</td>
+                                            <td>{{ appt.date }}</td>
+                                            <td>{{ appt.time }}</td>
+                                            <td>{{ appt.reason|default:"-"|truncatechars:40 }}</td>
+                                            <td><span class="badge badge-{{ appt.status }}">{{ appt.get_status_display }}</span></td>
+                                            <td>
+                                                <div class="btn-row btn-row-sm">
+                                                    {% if appt.status == 'pending' %}
+                                                        <form method="post" action="{% url 'appointment_status' appt.pk 'confirmed' %}" class="inline-form">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="btn btn-sm">Confirm</button>
+                                                        </form>
+                                                        <form method="post" action="{% url 'appointment_status' appt.pk 'rejected' %}" class="inline-form">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="btn btn-sm btn-danger">Reject</button>
+                                                        </form>
+                                                    {% elif appt.status == 'confirmed' %}
+                                                        <form method="post" action="{% url 'appointment_status' appt.pk 'completed' %}" class="inline-form">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="btn btn-sm btn-outline">Complete</button>
+                                                        </form>
+                                                        <form method="post" action="{% url 'appointment_status' appt.pk 'rejected' %}" class="inline-form">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="btn btn-sm btn-danger">Reject</button>
+                                                        </form>
+                                                    {% else %}
+                                                        <span class="muted">&mdash;</span>
+                                                    {% endif %}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        {% include 'includes/empty_state.html' with message="You have no appointments assigned yet." %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

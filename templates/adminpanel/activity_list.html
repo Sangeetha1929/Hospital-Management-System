@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Activity Log | CityCare Hospital{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+
+        <div class="page-head reveal">
+            <h2>Activity Log</h2>
+            <p class="muted">Everything that happens across the site &mdash; logins, registrations, doctors, appointments, patients and users.</p>
+        </div>
+
+        <div class="toolbar reveal">
+            <form method="get" class="search-form">
+                <input type="text" name="q" value="{{ query }}" placeholder="Search activity...">
+                <select name="category">
+                    <option value="">All Categories</option>
+                    {% for category in categories %}
+                        <option value="{{ category }}" {% if category_filter == category %}selected{% endif %}>{{ category }}</option>
+                    {% endfor %}
+                </select>
+                <select name="action">
+                    <option value="">All Actions</option>
+                    {% for key, label in action_choices %}
+                        <option value="{{ key }}" {% if action_filter == key %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-sm">Filter</button>
+            </form>
+            <a href="{% url 'admin_dashboard' %}" class="btn btn-sm btn-outline">Back to Dashboard</a>
+        </div>
+
+        <div class="card reveal">
+            {% if activities %}
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>When</th>
+                                <th>User</th>
+                                <th>Category</th>
+                                <th>Action</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for activity in activities %}
+                                <tr>
+                                    <td>{{ activity.created_at|date:"M j, Y H:i" }}</td>
+                                    <td>{{ activity.actor }}</td>
+                                    <td><span class="badge">{{ activity.category }}</span></td>
+                                    <td>{{ activity.get_action_display }}</td>
+                                    <td>{{ activity.description }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                {% include 'includes/empty_state.html' with message="No activity recorded yet." %}
+            {% endif %}
+        </div>
+
+    </div>
+</section>
+{% endblock %}

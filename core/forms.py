@@ -1,6 +1,7 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from .models import Profile
 from patients.models import Patient
 
@@ -75,3 +76,44 @@ class ProfileForm(forms.ModelForm):
         if commit:
             profile.save()
         return profile
+
+
+class AdminAuthenticationForm(AuthenticationForm):
+    """Login form for the admin login page: superusers only."""
+
+    error_messages = {
+        **AuthenticationForm.error_messages,
+        'not_admin': 'Access denied. Only administrators can log in here.',
+    }
+
+    def confirm_login_allowed(self, user):
+        super().confirm_login_allowed(user)
+        if not user.is_superuser:
+            raise ValidationError(
+                self.error_messages['not_admin'],
+                code='not_admin',
+            )
+
+
+class StaffExcludedAuthenticationForm(AuthenticationForm):
+    """Login form for the normal login page: patients and doctors only.
+
+    Administrators (Django superusers/staff) must use the dedicated
+    Admin Login page instead.
+    """
+
+    error_messages = {
+        **AuthenticationForm.error_messages,
+        'not_allowed': (
+            'Access denied. Administrators must log in through the '
+            'Admin Login page. Only patients and doctors can log in here.'
+        ),
+    }
+
+    def confirm_login_allowed(self, user):
+        super().confirm_login_allowed(user)
+        if user.is_superuser or user.is_staff:
+            raise ValidationError(
+                self.error_messages['not_allowed'],
+                code='not_allowed',
+            )

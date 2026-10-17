@@ -11,7 +11,7 @@
         <p>Providing compassionate, world-class healthcare for you and your family. Our team of expert doctors is here around the clock.</p>
         <div class="hero-actions">
             <a href="{% url 'doctor_list' %}" class="btn btn-lg">Meet Our Doctors</a>
-            {% if user.is_authenticated and user.profile.user_type == 'patient' %}
+            {% if user.is_authenticated and user.profile.user_type == 'patient' and not user.is_superuser %}
                 <a href="{% url 'appointment_create' %}" class="btn btn-lg btn-outline">Book Appointment</a>
             {% else %}
                 <a href="{% url 'register' %}" class="btn btn-lg btn-outline">Join Us</a>

@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard | CityCare Hospital{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+
+        <div class="page-head reveal">
+            <h2>Admin Dashboard</h2>
+            <p class="muted">Welcome back, {{ user.get_full_name|default:user.username }}. Here's your hospital at a glance.</p>
+        </div>
+
+        <div class="stats-grid stats-grid-3 reveal">
+            <div class="stat-card">
+                <h3>{{ stats.users }}</h3>
+                <p>Total Users</p>
+            </div>
+            <div class="stat-card">
+                <h3>{{ stats.patients }}</h3>
+                <p>Patients</p>
+            </div>
+            <div class="stat-card">
+                <h3>{{ stats.doctors }}</h3>
+                <p>Doctors</p>
+            </div>
+            <div class="stat-card">
+                <h3>{{ stats.appointments }}</h3>
+                <p>Appointments</p>
+            </div>
+            <div class="stat-card">
+                <h3>{{ stats.pending }}</h3>
+                <p>Pending Requests</p>
+            </div>
+            <div class="stat-card">
+                <h3>{{ stats.staff }}</h3>
+                <p>Staff Members</p>
+            </div>
+        </div>
+
+        <div class="toolbar reveal">
+            <div class="btn-row">
+                <a href="{% url 'admin_activity_list' %}" class="btn btn-sm">Activity Log</a>
+                <a href="{% url 'admin_user_list' %}" class="btn btn-sm">Manage Users</a>
+                <a href="{% url 'patient_list' %}" class="btn btn-sm btn-outline">Patients</a>
+                <a href="{% url 'appointment_list' %}" class="btn btn-sm btn-outline">Appointments</a>
+                <a href="{% url 'doctor_create' %}" class="btn btn-sm btn-outline">Add Doctor</a>
+                <a href="{% url 'doctor_list' %}" class="btn btn-sm btn-outline">Doctors</a>
+            </div>
+        </div>
+
+        <div class="card reveal">
+            <h3 style="margin-bottom: 1rem;">Recent Appointments</h3>
+            {% if recent_appointments %}
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Patient</th>
+                                <th>Doctor</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for appt in recent_appointments %}
+                                <tr>
+                                    <td>{{ appt.patient }}</td>
+                                    <td>Dr. {{ appt.doctor.name }}</td>
+                                    <td>{{ appt.date }}</td>
+                                    <td>{{ appt.time }}</td>
+                                    <td><span class="badge badge-{{ appt.status }}">{{ appt.get_status_display }}</span></td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                {% include 'includes/empty_state.html' with message="No appointments yet." %}
+            {% endif %}
+        </div>
+
+        <div class="card reveal">
+            <div class="toolbar" style="margin-bottom: 1rem;">
+                <h3>Recent Activity</h3>
+                <a href="{% url 'admin_activity_list' %}" class="btn btn-sm btn-outline">View all</a>
+            </div>
+            {% if recent_activities %}
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>When</th>
+                                <th>User</th>
+                                <th>Category</th>
+                                <th>Action</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for activity in recent_activities %}
+                                <tr>
+                                    <td>{{ activity.created_at|date:"M j, H:i" }}</td>
+                                    <td>{{ activity.actor }}</td>
+                                    <td><span class="badge">{{ activity.category }}</span></td>
+                                    <td>{{ activity.get_action_display }}</td>
+                                    <td>{{ activity.description }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                {% include 'includes/empty_state.html' with message="No activity recorded yet." %}
+            {% endif %}
+        </div>
+
+    </div>
+</section>
+{% endblock %}

@@ -27,10 +27,13 @@
                     <li><a href="{% url 'home' %}">Home</a></li>
                     <li><a href="{% url 'doctor_list' %}">Doctors</a></li>
                     {% if user.is_authenticated %}
-                        {% if user.profile.user_type == 'patient' %}
+                        {% if user.profile.user_type == 'patient' and not user.is_superuser %}
                             <li><a href="{% url 'patient_dashboard' %}">Dashboard</a></li>
                             <li><a href="{% url 'appointment_list' %}">Appointments</a></li>
-                        {% elif user.profile.user_type == 'staff' %}
+                        {% elif user.profile.user_type == 'doctor' and not user.is_superuser %}
+                            <li><a href="{% url 'doctor_dashboard' %}">Dashboard</a></li>
+                            <li><a href="{% url 'appointment_list' %}">My Appointments</a></li>
+                        {% elif user.is_superuser %}
                             <li><a href="{% url 'patient_list' %}">Patients</a></li>
                             <li><a href="{% url 'appointment_list' %}">Appointments</a></li>
                             <li><a href="{% url 'doctor_create' %}">Add Doctor</a></li>
@@ -38,8 +41,13 @@
                     {% endif %}
                 </ul>
                 <ul class="nav-actions">
+                    {% if user.is_authenticated and user.is_superuser %}
+                        <li><a href="{% url 'admin_dashboard' %}" class="btn btn-sm btn-admin">Admin</a></li>
+                    {% elif not user.is_authenticated %}
+                        <li><a href="{% url 'admin_login' %}" class="btn btn-sm btn-admin">Admin</a></li>
+                    {% endif %}
                     {% if user.is_authenticated %}
-                        <li><a href="{% url 'profile' %}" class="btn btn-sm">{{ user.username }}</a></li>
+                        <li><a href="{% url 'profile' %}" class="btn btn-sm btn-outline">{{ user.username }}</a></li>
                         <li>
                             <form action="{% url 'logout' %}" method="post" class="inline-form">
                                 {% csrf_token %}
@@ -86,7 +94,9 @@
                 <ul>
                     <li><a href="{% url 'home' %}">Home</a></li>
                     <li><a href="{% url 'doctor_list' %}">Our Doctors</a></li>
-                    <li><a href="{% url 'appointment_create' %}">Book Appointment</a></li>
+                    {% if not user.is_authenticated or user.profile.user_type == 'patient' and not user.is_superuser %}
+                        <li><a href="{% url 'appointment_create' %}">Book Appointment</a></li>
+                    {% endif %}
                     {% if user.is_authenticated %}
                         <li><a href="{% url 'profile' %}">My Profile</a></li>
                     {% endif %}

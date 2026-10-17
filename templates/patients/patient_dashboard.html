@@ -64,7 +64,7 @@
                                             <td>{{ appt.time }}</td>
                                             <td><span class="badge badge-{{ appt.status }}">{{ appt.get_status_display }}</span></td>
                                             <td>
-                                                {% if appt.status != 'cancelled' and appt.status != 'completed' %}
+                                                {% if appt.status != 'cancelled' and appt.status != 'completed' and appt.status != 'rejected' %}
                                                     <a href="{% url 'appointment_cancel' appt.pk %}" class="btn btn-sm btn-danger">Cancel</a>
                                                 {% endif %}
                                             </td>

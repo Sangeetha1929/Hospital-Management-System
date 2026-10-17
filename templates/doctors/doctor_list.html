@@ -38,7 +38,7 @@
                     <p class="muted">{{ doctor.experience_years }} years experience</p>
                     <div class="doctor-actions">
                         <a href="{% url 'doctor_detail' doctor.pk %}" class="btn btn-sm btn-outline">Details</a>
-                        {% if user.is_authenticated and user.profile.user_type == 'staff' %}
+                        {% if user.is_authenticated and user.is_superuser %}
                             <a href="{% url 'doctor_update' doctor.pk %}" class="btn btn-sm">Edit</a>
                         {% endif %}
                     </div>

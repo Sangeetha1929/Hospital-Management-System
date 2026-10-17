@@ -49,17 +49,20 @@ Built **without Bootstrap** or any CSS framework — all styling is custom, full
 - Cancel appointment
 - Appointment status: `Pending → Confirmed → Completed` / `Cancelled`
 
-### 6. Staff / Admin
-- Manage doctors (add / edit / delete)
+### 6. Admin (Django superuser only)
+- Access the in-site Admin Dashboard (`/admin-panel/`)
+- Manage doctors (add / edit / delete), including linking a login account so a doctor can manage their own appointments
 - Manage patients (view all, view details, delete)
-- Manage appointments (confirm, complete, cancel)
+- View all appointments and confirm, reject or complete them
+- Manage users (grant / revoke admin access, delete accounts) and review the activity log
 
 ### 7. Permissions (Role-Based Access)
 | Role | Allowed |
 | --- | --- |
 | **Guest** (not logged in) | View doctors only |
 | **Patient** | Book and manage **their own** appointments + manage their profile |
-| **Staff** | Manage doctors, patients and all appointments |
+| **Doctor** | View and manage appointments **assigned to them** (confirm / reject / complete) |
+| **Admin** (Django superuser) | Full admin dashboard: doctors, patients, all appointments, users |
 
 ### 8. Database Models
 - `Profile` (`core`) — linked 1-to-1 to Django's `User`; stores user type (patient/staff), phone, address
@@ -361,8 +364,8 @@ class Appointment(models.Model):  # FK to Patient and Doctor, status choices
 - `appointments/forms.py` — `AppointmentForm` (booking form, doctor dropdown from DB).
 
 ### Views
-- `core/views.py` — `home()`, `register()`, `profile()` + role helpers `is_staff()` / `is_patient()`.
-- `doctors/views.py` — `doctor_*` CRUD guarded by `@user_passes_test(is_staff)`.
+- `core/views.py` — `home()`, `register()`, `profile()` + role helpers `is_admin()` / `is_doctor()` / `is_patient()`.
+- `doctors/views.py` — `doctor_*` CRUD guarded by `@user_passes_test(is_admin)`; `doctor_dashboard` for doctors.
 - `patients/views.py` — `patient_dashboard`, `patient_update`, `patient_list`, `patient_detail`, `patient_delete` guarded by role.
 - `appointments/views.py` — `appointment_create`, `appointment_list`, `appointment_cancel`, `appointment_update_status` with ownership checks.
 
@@ -444,7 +447,7 @@ python manage.py check
 | Tables missing | Run `python manage.py makemigrations` then `python manage.py migrate`. |
 | Forgot password | `python manage.py createsuperuser` again, or manage from `python manage.py shell`. |
 | Static files (CSS) not loading | Confirm `STATICFILES_DIRS = [BASE_DIR / 'static']` in `settings.py` and the folder path `static/css/style.css` exists. |
-| Staff menu not showing after superuser login | Superusers are not auto-set to Staff — change `Profile → user_type` to `Staff` in `/admin/`. |
+| Admin menu not showing | Only Django superusers can access the Admin Dashboard. Create one with `python manage.py create_admin <username> --password <pass>`. |
 | Login redirects aren't working | Check `LOGIN_URL`, `LOGIN_REDIRECT_URL`, `LOGOUT_REDIRECT_URL` in `settings.py`. |
 | URL reverse errors (`NoReverseMatch`) | Make sure each app's `urls.py` is included from `hospital_management/urls.py` and the `{% url %}` names match. |
 

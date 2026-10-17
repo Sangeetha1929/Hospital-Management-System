@@ -9,7 +9,12 @@
         <p class="muted">Welcome back!</p>
 
         {% if form.errors %}
-            <div class="alert alert-error">Incorrect username or password.</div>
+            {% for error in form.non_field_errors %}
+                <div class="alert alert-error">{{ error }}</div>
+            {% endfor %}
+            {% if not form.non_field_errors %}
+                <div class="alert alert-error">Incorrect username or password.</div>
+            {% endif %}
         {% endif %}
 
         <form method="post" class="form" novalidate>
@@ -25,6 +30,7 @@
             <button type="submit" class="btn btn-block">Login</button>
         </form>
         <p class="auth-link">Don't have an account? <a href="{% url 'register' %}">Register</a></p>
+        <p class="auth-link muted" style="margin-top: 0.5rem; font-size: 0.85rem;">Administrator? <a href="{% url 'admin_login' %}">Admin login</a></p>
     </div>
 </div>
 {% endblock %}

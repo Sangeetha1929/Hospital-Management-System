@@ -15,7 +15,7 @@
             <h2>Appointments</h2>
 
             <p class="muted">
-                {% if user.profile.user_type == 'staff' %}
+                {% if user.is_superuser %}
                     Manage all appointments
                 {% else %}
                     Your appointments
@@ -55,7 +55,7 @@
 
 
             <!-- Patient Only: Book Appointment -->
-            {% if user.profile.user_type == 'patient' %}
+            {% if user.profile.user_type == 'patient' and not user.is_superuser %}
 
                 <a href="{% url 'appointment_create' %}"
                    class="btn btn-sm">
@@ -142,10 +142,7 @@
 
                                         <div class="btn-row btn-row-sm">
 
-
-                                            <!-- STAFF / ADMIN ACTIONS -->
-                                            {% if user.profile.user_type == 'staff' %}
-
+                                            {% if user.is_superuser or user.profile.user_type == 'doctor' %}
 
                                                 <!-- Pending Appointment -->
                                                 {% if appt.status == 'pending' %}
@@ -153,28 +150,36 @@
                                                         {% csrf_token %}
                                                         <button type="submit" class="btn btn-sm">Confirm</button>
                                                     </form>
+                                                    <form method="post" action="{% url 'appointment_status' appt.pk 'rejected' %}" class="inline-form">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-sm btn-danger">Reject</button>
+                                                    </form>
 
                                                 {% elif appt.status == 'confirmed' %}
                                                     <form method="post" action="{% url 'appointment_status' appt.pk 'completed' %}" class="inline-form">
                                                         {% csrf_token %}
                                                         <button type="submit" class="btn btn-sm btn-outline">Complete</button>
                                                     </form>
+                                                    <form method="post" action="{% url 'appointment_status' appt.pk 'rejected' %}" class="inline-form">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-sm btn-danger">Reject</button>
+                                                    </form>
+
+                                                {% else %}
+                                                    <span class="muted">&mdash;</span>
                                                 {% endif %}
 
+                                            {% else %}
+
+                                                <!-- Patient: cancel own appointment -->
+                                                {% if appt.status != 'cancelled' and appt.status != 'completed' and appt.status != 'rejected' %}
+                                                    <a href="{% url 'appointment_cancel' appt.pk %}"
+                                                       class="btn btn-sm btn-danger">
+                                                        Cancel
+                                                    </a>
+                                                {% endif %}
 
                                             {% endif %}
-
-
-                                            <!-- Cancel Action -->
-                                            {% if appt.status != 'cancelled' and appt.status != 'completed' %}
-
-                                                <a href="{% url 'appointment_cancel' appt.pk %}"
-                                                   class="btn btn-sm btn-danger">
-                                                    Cancel
-                                                </a>
-
-                                            {% endif %}
-
 
                                         </div>
 
@@ -193,7 +198,7 @@
 
             {% else %}
 
-                {% if user.profile.user_type == 'patient' %}
+                {% if user.profile.user_type == 'patient' and not user.is_superuser %}
                     {% include 'includes/empty_state.html' with message="No appointments yet. Book your first visit." action_url=book_url action_label="Book Appointment" %}
                 {% else %}
                     {% include 'includes/empty_state.html' with message="No appointments found." %}

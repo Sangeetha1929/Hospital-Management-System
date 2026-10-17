@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils import timezone
-from core.views import is_staff, is_patient
+from core.views import is_admin, is_patient
+from adminpanel.utils import log_activity
 from .models import Patient
 from .forms import PatientForm
 
@@ -44,6 +45,10 @@ def patient_update(request):
             request.user.last_name = form.cleaned_data['last_name']
             request.user.email = form.cleaned_data['email']
             request.user.save()
+            log_activity(
+                request.user, 'update', 'Patient',
+                f'{request.user.username} updated their profile.',
+            )
             messages.success(request, 'Profile updated successfully.')
             return redirect('patient_dashboard')
     else:
@@ -55,7 +60,7 @@ def patient_update(request):
 
 
 @login_required
-@user_passes_test(is_staff, login_url='home')
+@user_passes_test(is_admin, login_url='admin_login')
 def patient_list(request):
     patients = Patient.objects.all()
     query = request.GET.get('q', '')
@@ -66,7 +71,7 @@ def patient_list(request):
 
 
 @login_required
-@user_passes_test(is_staff, login_url='home')
+@user_passes_test(is_admin, login_url='admin_login')
 def patient_detail(request, pk):
     patient = get_object_or_404(Patient, pk=pk)
     appointments = patient.appointments.all()
@@ -74,13 +79,15 @@ def patient_detail(request, pk):
 
 
 @login_required
-@user_passes_test(is_staff, login_url='home')
+@user_passes_test(is_admin, login_url='admin_login')
 def patient_delete(request, pk):
     patient = get_object_or_404(Patient, pk=pk)
     if request.method == 'POST':
         user = patient.user
+        username = user.username
         patient.delete()
         user.delete()
+        log_activity(request.user, 'delete', 'Patient', f'Removed patient {username}.')
         messages.success(request, 'Patient removed successfully.')
         return redirect('patient_list')
     return render(request, 'patients/patient_confirm_delete.html', {'patient': patient})

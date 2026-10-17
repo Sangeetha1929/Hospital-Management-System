@@ -9,6 +9,7 @@ class Appointment(models.Model):
         ('confirmed', 'Confirmed'),
         ('completed', 'Completed'),
         ('cancelled', 'Cancelled'),
+        ('rejected', 'Rejected'),
     ]
 
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='appointments')

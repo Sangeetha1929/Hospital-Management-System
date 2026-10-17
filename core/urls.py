@@ -7,7 +7,8 @@ urlpatterns = [
     path('', views.home, name='home'),
 
     path('register/', views.register, name='register'),
-    path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
+    path('login/', views.RoleLoginView.as_view(), name='login'),
+    path('admin-login/', views.AdminLoginView.as_view(), name='admin_login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('profile/', views.profile, name='profile'),
     path('doctors/', include('doctors.urls')),
@@ -15,4 +16,5 @@ urlpatterns = [
     path('patient/edit/', patients_views.patient_update, name='patient_update'),
     path('patients/', include('patients.urls')),
     path('appointments/', include('appointments.urls')),
+    path('admin-panel/', include('adminpanel.urls')),
 ]

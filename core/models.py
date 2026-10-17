@@ -7,7 +7,7 @@ from django.dispatch import receiver
 class Profile(models.Model):
     USER_TYPE_CHOICES = [
         ('patient', 'Patient'),
-        ('staff', 'Staff / Admin'),
+        ('doctor', 'Doctor'),
     ]
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')

@@ -351,6 +351,18 @@ hr {
     border-radius: 8px;
 }
 
+/* Distinct Admin button in the header */
+.btn-admin {
+    background: linear-gradient(135deg, #6d28d9 0%, #4f46e5 100%);
+    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.32);
+    background-size: 200% auto;
+    letter-spacing: 0.01em;
+}
+
+.btn-admin:hover {
+    box-shadow: 0 8px 24px rgba(79, 70, 229, 0.45);
+}
+
 .btn-lg {
     padding: 0.9rem 2.2rem;
     font-size: 1.05rem;
@@ -1206,6 +1218,12 @@ tbody tr:last-child td {
     border-color: #f6c6c6;
 }
 
+.badge-rejected {
+    background: #fbe0e6;
+    color: #9d174d;
+    border-color: #f4c2d0;
+}
+
 .badge-patient {
     background: #e0ebf8;
     color: #2456a0;
@@ -1216,6 +1234,12 @@ tbody tr:last-child td {
     background: #f0e4fa;
     color: #6a2c9e;
     border-color: #e3ccf5;
+}
+
+.badge-doctor {
+    background: #d8f3ee;
+    color: #0b6b5b;
+    border-color: #b6e6db;
 }
 
 /* ============ Profile Layout ============ */
